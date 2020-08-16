@@ -1,4 +1,5 @@
 use amethyst::{
+    ecs::{World, WorldExt},
     prelude::*,
     renderer::{
         plugins::{RenderFlat2D, RenderToWindow},
@@ -9,13 +10,21 @@ use amethyst::{
 };
 
 mod wizard;
+mod deck;
 
 use crate::wizard::WizardState;
+use crate::deck::*;
+
+#[derive(Debug)]
+struct PlayerScore {
+    pub score: i32,
+}
 
 fn main() -> amethyst::Result<()> {
     // set up loggers and load application assets
     amethyst::start_logger(Default::default());
     let app_root = application_root_dir()?;
+    let assets_dir = app_root.join("assets");
     let display_config_path = app_root.join("config").join("display.ron");
 
     // start renderer
@@ -28,8 +37,21 @@ fn main() -> amethyst::Result<()> {
             .with_plugin(RenderFlat2D::default()),
     )?;
 
-    let mut game = Application::new(app_root, WizardState, game_data)?;
+    let mut world = World::empty();
+    // register card entity
+    world.register::<deck::Deck>();
+
+    // create scores per player that joined
+    let score = PlayerScore {
+        score: 0,
+    };
+
+    world.insert(score);
+    initialize_deck(world);
+
+    let mut game = Application::new(assets_dir, WizardState, game_data)?;
     game.run();
 
     Ok(())
 }
+

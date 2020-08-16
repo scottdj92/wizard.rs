@@ -12,7 +12,6 @@ pub const ARENA_WIDTH: f32 = 100.0;
 
 impl SimpleState for WizardState {
     fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
-        println!("Hello world");
         initialize_camera(_data.world);
     }
 
